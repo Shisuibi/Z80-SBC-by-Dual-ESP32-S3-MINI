@@ -1,0 +1,716 @@
+			  Z80 ASSEMBLER - ZASM VER 1.6
+                      	
+                      	;/==============================================================================/;
+                      	;/		Z80 Single Board Computer "PC-84C0SD 20MHz" Initial Program Loader		/;
+                      	;/				Implemented by Shisuibi ～Grand Master Sorcerian～				/;
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0000                	CpmBootBaseAdrs			EQU				0000H			;/	基底アドレス（IPL）
+  F200                	CpmBiosBaseAdrs			EQU				0F200H			;/	基底アドレス（BIOS）
+                      	;/------------------------------------------------------------------------------/;
+  DC00                	CpmCcprBaseAdrs			EQU				0DC00H			;/	基底アドレス（CCP）
+  E400                	CpmBdosBaseAdrs			EQU				0E400H			;/	基底アドレス（BDOS）
+                      	;/------------------------------------------------------------------------------/;
+  0100                	DiskSectorMax			EQU				0100H			;/	DISKセクター上限
+  0000                	SystemTrackOffset		EQU				0000H			;/	DISKトラック転読
+                      	;/------------------------------------------------------------------------------/;
+  0400                	DiskBlockMax			EQU				0400H			;/	DISKブロック上限
+  0200                	DiskEntryMax			EQU				0200H			;/	DISK管理情報上限
+                      	;/------------------------------------------------------------------------------/;
+  0000                	SectorTransTable		EQU				0000H			;/	セクター変換テーブル
+  0000                	CheckSumVector			EQU				0000H			;/	セクター照合テーブル
+                      	;/------------------------------------------------------------------------------/;
+  0000                	DirectoryCheckSize		EQU				0000H			;/	セクター照合サイズ
+  0080                	AllocVectorSize			EQU				0080H			;/	ブロック割当サイズ
+                      	;/------------------------------------------------------------------------------/;
+  0080                	ColdBootStack			EQU				0080H			;/	起動用スタック
+  0080                	SectorDmaBuffer			EQU				0080H			;/	セクターDMA転送領域
+                      	;/------------------------------------------------------------------------------/;
+  0000                	NUL						EQU				00H				;/	ASCIIコード（NUL）
+  000A                	LF						EQU				0AH				;/	ASCIIコード（LF）
+  000D                	CR						EQU				0DH				;/	ASCIIコード（CR）
+                      	;/------------------------------------------------------------------------------/;
+  00DF                	UpperLowerCase			EQU				0DFH			;/	大文字小文字変換
+                      	;/------------------------------------------------------------------------------/;
+  00AA                	InitAnyNum02			EQU				0AAH			;/	初期値（任意データ00～02）
+  0015                	InitAnyNum03			EQU				15H				;/	初期値（任意データ03）
+                      	;/------------------------------------------------------------------------------/;
+  0000                	PortMakeDisk			EQU				00H				;/	PIOポート（MakeDisk呼出）
+                      	
+  0002                	PortBiosParamL			EQU				02H				;/	PIOポート（BIOS引数下位）
+  0003                	PortBiosParamH			EQU				03H				;/	PIOポート（BIOS引数上位）
+                      	
+  0020                	PortAnyNum00			EQU				20H				;/	PIOポート（任意データ00）
+  0021                	PortAnyNum01			EQU				21H				;/	PIOポート（任意データ01）
+                      	
+  0022                	PortAnyNum02			EQU				22H				;/	PIOポート（任意データ02）
+  0023                	PortAnyNum03			EQU				23H				;/	PIOポート（任意データ03）
+                      	
+  0030                	PortUartCtrl			EQU				30H				;/	PIOポート（UART制御）
+  0031                	PortUartData			EQU				31H				;/	PIOポート（UARTデータ）
+                      	;/------------------------------------------------------------------------------/;
+  0080                	PortBiosWBoot			EQU				80H				;/	PIOポート（CP/M開始）	
+  0081                	PortBiosConSt			EQU				81H				;/	PIOポート（UART制御）
+  0082                	PortBiosConIn			EQU				82H				;/	PIOポート（UART受信）
+  0083                	PortBiosConOut			EQU				83H				;/	PIOポート（UART送信）
+                      	
+  0084                	PortBiosList			EQU				84H				;/	PIOポート（リスト出力）
+  0085                	PortBiosPunch			EQU				85H				;/	PIOポート（パンチ出力）
+  0086                	PortBiosReader			EQU				86H				;/	PIOポート（リーダ入力）
+  0087                	PortBiosHome			EQU				87H				;/	PIOポート（ヘッド帰還）
+                      	
+  0088                	PortBiosSelDsk			EQU				88H				;/	PIOポート（ドライブ選択）
+  0089                	PortBiosSetTrk			EQU				89H				;/	PIOポート（トラック選択）
+  008A                	PortBiosSetSec			EQU				8AH				;/	PIOポート（セクター選択）
+  008B                	PortBiosSetDma			EQU				8BH				;/	PIOポート（DMAアドレス）
+                      	
+  008C                	PortBiosRead			EQU				8CH				;/	PIOポート（セクター読込）
+  008D                	PortBiosWrite			EQU				8DH				;/	PIOポート（セクター書込）
+  008E                	PortBiosListSt			EQU				8EH				;/	PIOポート（リスト制御）
+  008F                	PortBiosSecTran			EQU				8FH				;/	PIOポート（セクター変換）
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0000                	ORG		CpmBootBaseAdrs
+                      	;/------------------------------------------------------------------------------/;
+  0000                	CpmWarmBoot:
+  0000  C34000        		JP		ColdBootInit
+                      	;/------------------------------------------------------------------------------/;
+  0003                	CpmIoByte:
+  0003  00            		DB		00H
+                      	;/------------------------------------------------------------------------------/;
+  0004                	CpmDriveUser:
+  0004  00            		DB		00H
+                      	;/------------------------------------------------------------------------------/;
+  0005                	CpmBdosCall:
+  0005  C306E4        		JP		CpmBdosBaseAdrs + 0006H
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0008                	ORG		0008H
+                      	;/------------------------------------------------------------------------------/;
+  0008                	TransSend:
+  0008  D331          		OUT		(PortUartData), A
+                      	
+  000A  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  0010                	ORG		0010H
+                      	;/------------------------------------------------------------------------------/;
+  0010                	TransRecv:
+  0010  DB31          		IN		A, (PortUartData)
+  0012  FE00          		CP		NUL
+  0014  28FA          		JR		Z, TransRecv
+                      	
+  0016  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  0018                	ORG		0018H
+                      	;/------------------------------------------------------------------------------/;
+  0018                	TransCheck:
+  0018  DB30          		IN		A, (PortUartCtrl)
+  001A  FE00          		CP		NUL
+                      	
+  001C  C9            		RET
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0038                	ORG		0038H
+                      	;/------------------------------------------------------------------------------/;
+  0038                	TransInterrupt:
+  0038  F5            		PUSH	AF
+  0039  F1            		POP		AF
+                      	
+  003A  FB            		EI
+  003B  ED4D          		RETI
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0040                	ORG		0040H
+                      	;/------------------------------------------------------------------------------/;
+  0040                	ColdBootInit:
+  0040  F3            		DI
+  0041  ED56          		IM		1
+                      	;/------------------------------------------------------------------------------/;
+  0043                	ColdBootMove:
+  0043  3EAA          		LD		A, InitAnyNum02
+  0045  D320          		OUT		(PortAnyNum00), A
+  0047  D321          		OUT		(PortAnyNum01), A
+  0049  D322          		OUT		(PortAnyNum02), A
+                      	
+  004B  3E15          		LD		A, InitAnyNum03
+  004D  D323          		OUT		(PortAnyNum03), A
+                      	;/------------------------------------------------------------------------------/;
+  004F                	ColdBootDisp:
+  004F  218000        		LD		HL, ColdBootMsgTop
+  0052  066A          		LD		B, ColdBootMsgBtm - ColdBootMsgTop
+  0054  0E31          		LD		C, PortUartData
+  0056  EDB3          		OTIR
+                      	;/------------------------------------------------------------------------------/;
+  0058                	ColdBootExit:
+  0058  218000        		LD		HL, ColdBootStack
+  005B  F9            		LD		SP, HL
+                      	
+  005C  FB            		EI
+  005D  C300F2        		JP		CpmBiosBaseAdrs
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0066                	ORG		0066H
+                      	;/------------------------------------------------------------------------------/;
+  0066                	TransNonMaskInt:
+  0066  F5            		PUSH	AF
+  0067  F1            		POP		AF
+                      	
+  0068  ED45          		RETN
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0080                	ORG		SectorDmaBuffer
+                      	;/------------------------------------------------------------------------------/;
+  0080                	ColdBootMsgTop:
+  0080  5A38302053696E		DB		"Z80 Single Board Computer <<<< PC-84C0SD 20MHz >>>>", CR, LF
+  00B5  20496D706C656D		DB		" Implemented by Shisuibi --Grand Master Sorcerian--", CR, LF
+  00EA                	ColdBootMsgBtm:
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0100                	ORG		0100H
+                      	;/------------------------------------------------------------------------------/;
+  0100                	CpmBiosEntry:
+  0100  C399F4        		JP		CpmBiosBaseAdrs + CpmBiosBoot    - CpmBiosEntry
+  0103  C3CEF4        		JP		CpmBiosBaseAdrs + CpmBiosWBoot   - CpmBiosEntry
+  0106  C3D3F4        		JP		CpmBiosBaseAdrs + CpmBiosConSt   - CpmBiosEntry
+  0109  C3D6F4        		JP		CpmBiosBaseAdrs + CpmBiosConIn   - CpmBiosEntry
+  010C  C3DDF4        		JP		CpmBiosBaseAdrs + CpmBiosConOut  - CpmBiosEntry
+  010F  C3E1F4        		JP		CpmBiosBaseAdrs + CpmBiosList    - CpmBiosEntry
+  0112  C3E5F4        		JP		CpmBiosBaseAdrs + CpmBiosPunch   - CpmBiosEntry
+  0115  C3E9F4        		JP		CpmBiosBaseAdrs + CpmBiosReader  - CpmBiosEntry
+  0118  C3ECF4        		JP		CpmBiosBaseAdrs + CpmBiosHome    - CpmBiosEntry
+  011B  C3F0F4        		JP		CpmBiosBaseAdrs + CpmBiosSelDsk  - CpmBiosEntry
+  011E  C300F5        		JP		CpmBiosBaseAdrs + CpmBiosSetTrk  - CpmBiosEntry
+  0121  C307F5        		JP		CpmBiosBaseAdrs + CpmBiosSetSec  - CpmBiosEntry
+  0124  C30EF5        		JP		CpmBiosBaseAdrs + CpmBiosSetDma  - CpmBiosEntry
+  0127  C315F5        		JP		CpmBiosBaseAdrs + CpmBiosRead    - CpmBiosEntry
+  012A  C31BF5        		JP		CpmBiosBaseAdrs + CpmBiosWrite   - CpmBiosEntry
+  012D  C321F5        		JP		CpmBiosBaseAdrs + CpmBiosListSt  - CpmBiosEntry
+  0130  C324F5        		JP		CpmBiosBaseAdrs + CpmBiosSecTran - CpmBiosEntry
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0200                	ORG		0200H
+                      	;/------------------------------------------------------------------------------/;
+  0200                	CpmMakeDiskInit:
+  0200  218000        		LD		HL, ColdBootStack
+  0203  F9            		LD		SP, HL
+                      	
+  0204  0E31          		LD		C, PortUartData
+                      	;/------------------------------------------------------------------------------/;
+  0206                	CpmMakeDisp1or2:
+  0206  21DDF3        		LD		HL, CpmBiosBaseAdrs + CpmMakeMsgTop - CpmBiosEntry
+  0209  067F          		LD		B, CpmMakeMsgAtoP - CpmMakeMsgTop
+  020B  EDB3          		OTIR
+                      	;/------------------------------------------------------------------------------/;
+  020D                	CpmMakeMove1or2:
+  020D  D7            		RST		TransRecv
+  020E  57            		LD		D, A
+                      	
+  020F  FE32          		CP		'2'
+  0211  2810          		JR		Z, CpmMakeDispNum2
+                      	
+  0213  FE31          		CP		'1'
+  0215  20F6          		JR		NZ, CpmMakeMove1or2
+                      	;/------------------------------------------------------------------------------/;
+  0217                	CpmMakeDispNum1:
+  0217  CD5DF3        		CALL	CpmBiosBaseAdrs + CpmMakeDiskMove - CpmBiosEntry
+                      	
+  021A  2104F4        		LD		HL, CpmBiosBaseAdrs + CpmMakeMsgNum1 - CpmBiosEntry
+  021D  061D          		LD		B, CpmMakeMsgNum2 - CpmMakeMsgNum1
+  021F  EDB3          		OTIR
+                      	
+  0221  180A          		JR		CpmMakeDispAtoP
+                      	;/------------------------------------------------------------------------------/;
+  0223                	CpmMakeDispNum2:
+  0223  CD5DF3        		CALL	CpmBiosBaseAdrs + CpmMakeDiskMove - CpmBiosEntry
+                      	
+  0226  2121F4        		LD		HL, CpmBiosBaseAdrs + CpmMakeMsgNum2 - CpmBiosEntry
+  0229  061D          		LD		B, CpmMakeMsg1or2 - CpmMakeMsgNum2
+  022B  EDB3          		OTIR
+                      	;/------------------------------------------------------------------------------/;
+  022D                	CpmMakeDispAtoP:
+  022D  215CF4        		LD		HL, CpmBiosBaseAdrs + CpmMakeMsgAtoP - CpmBiosEntry
+  0230  0626          		LD		B, CpmMakeMsgYorN - CpmMakeMsgAtoP
+  0232  EDB3          		OTIR
+                      	;/------------------------------------------------------------------------------/;
+  0234                	CpmMakeMoveAtoP:
+  0234  D7            		RST		TransRecv
+  0235  E6DF          		AND		UpperLowerCase
+  0237  5F            		LD		E, A
+                      	
+  0238  FE41          		CP		'A'
+  023A  38F8          		JR		C, CpmMakeMoveAtoP
+                      	
+  023C  FE51          		CP		'P' + 1
+  023E  3804          		JR		C, CpmMakeDispYorN
+                      	
+  0240  FE5A          		CP		'Z'
+  0242  20F0          		JR		NZ, CpmMakeMoveAtoP
+                      	;/------------------------------------------------------------------------------/;
+  0244                	CpmMakeDispYorN:
+  0244  CD5DF3        		CALL	CpmBiosBaseAdrs + CpmMakeDiskMove - CpmBiosEntry
+                      	
+  0247  2182F4        		LD		HL, CpmBiosBaseAdrs + CpmMakeMsgYorN - CpmBiosEntry
+  024A  0617          		LD		B, CpmMakeMsgBtm - CpmMakeMsgYorN
+  024C  EDB3          		OTIR
+                      	;/------------------------------------------------------------------------------/;
+  024E                	CpmMakeMoveYorN:
+  024E  D7            		RST		TransRecv
+  024F  E6DF          		AND		UpperLowerCase
+                      	
+  0251  FE59          		CP		'Y'
+  0253  2810          		JR		Z, CpmMakeDiskExit
+                      	
+  0255  FE4E          		CP		'N'
+  0257  20F5          		JR		NZ, CpmMakeMoveYorN
+                      	
+  0259  21C7F4        		LD		HL, CpmBiosBaseAdrs + CpmBiosExit - CpmBiosEntry
+  025C  E5            		PUSH	HL
+                      	;/------------------------------------------------------------------------------/;
+  025D                	CpmMakeDiskMove:
+  025D  CF            		RST		TransSend
+                      	
+  025E  3E0D          		LD		A, CR
+  0260  CF            		RST		TransSend
+                      	
+  0261  3E0A          		LD		A, LF
+  0263  CF            		RST		TransSend
+                      	
+  0264  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  0265                	CpmMakeDiskExit:
+  0265  CD5DF3        		CALL	CpmBiosBaseAdrs + CpmMakeDiskMove - CpmBiosEntry
+                      	
+  0268  7A            		LD		A, D
+  0269  D303          		OUT		(PortBiosParamH), A
+                      	
+  026B  7B            		LD		A, E
+  026C  D300          		OUT		(PortMakeDisk), A
+                      	
+  026E  76            		HALT												;/	System Reset
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  026F                	CpmBiosMsgTop:
+  026F  0D0A          		DB		CR, LF
+  0271  43502F4D20322E		DB		"CP/M 2.2 Copyright (C) 1979 Digital Research", CR, LF
+  029F  4E617473756D69		DB		"Natsumi Gen4 CP/M 2.2 BIOS (C) 2026 Shisuibi", CR, LF
+  02CD                	CpmBiosMsgBtm:
+                      	;/------------------------------------------------------------------------------/;
+  02CD                	CpmBiosSubTop:
+  02CD  5355424D495420		DB		"SUBMIT AUTOEXEC", NUL
+  02DD                	CpmBiosSubBtm:
+                      	;/------------------------------------------------------------------------------/;
+  02DD                	CpmMakeMsgTop:
+  02DD  0D0A          		DB		CR, LF
+  02DF  3C3C3C3C204350		DB		"<<<< CP/M Disk Image Manager >>>>", CR, LF
+  0302  0D0A          		DB		CR, LF
+  0304                	CpmMakeMsgNum1:
+  0304  312E204D532D44		DB		"1. MS-DOS FAT -> CP/M Image", CR, LF
+  0321                	CpmMakeMsgNum2:
+  0321  322E2043502F4D		DB		"2. CP/M Image -> MS-DOS FAT", CR, LF
+  033E                	CpmMakeMsg1or2:
+  033E  0D0A          		DB		CR, LF
+  0340  57686963682064		DB		"Which do you want (1 or 2)? "
+  035C                	CpmMakeMsgAtoP:
+  035C  0D0A          		DB		CR, LF
+  035E  57686963682064		DB		"Which drive is it (A to P / All:Z)? "
+  0382                	CpmMakeMsgYorN:
+  0382  41726520796F75		DB		"Are you sure (Y or N)? "
+  0399                	CpmMakeMsgBtm:
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0399                	CpmBiosBoot:
+  0399  2103F2        		LD		HL, CpmBiosBaseAdrs + 0003H
+  039C  220100        		LD		(CpmWarmBoot + 0001H), HL
+                      	;/------------------------------------------------------------------------------/;
+  039F                	CpmBiosInit:
+  039F  AF            		XOR		A
+  03A0  320300        		LD		(CpmIoByte), A
+  03A3  320400        		LD		(CpmDriveUser), A
+                      	;/------------------------------------------------------------------------------/;
+  03A6                	CpmBiosDisp:
+  03A6  216FF3        		LD		HL, CpmBiosBaseAdrs + CpmBiosMsgTop - CpmBiosEntry
+  03A9  065E          		LD		B, CpmBiosMsgBtm - CpmBiosMsgTop
+  03AB  0E31          		LD		C, PortUartData
+  03AD  EDB3          		OTIR
+                      	;/------------------------------------------------------------------------------/;
+  03AF                	CpmBiosMove:
+  03AF  AF            		XOR		A
+  03B0  D380          		OUT		(PortBiosWBoot), A
+                      	
+  03B2  DB02          		IN		A, (PortBiosParamL)
+  03B4  FE00          		CP		0
+  03B6  280F          		JR		Z, CpmBiosExit
+                      	
+  03B8  21CDF3        		LD		HL, CpmBiosBaseAdrs + CpmBiosSubTop - CpmBiosEntry
+  03BB  1108DC        		LD		DE, CpmCcprBaseAdrs + 0008H
+  03BE  011000        		LD		BC, CpmBiosSubBtm - CpmBiosSubTop
+                      	
+  03C1  79            		LD		A, C
+  03C2  3207DC        		LD		(CpmCcprBaseAdrs + 0007H), A
+  03C5  EDB0          		LDIR
+                      	;/------------------------------------------------------------------------------/;
+  03C7                	CpmBiosExit:
+  03C7  3A0400        		LD		A, (CpmDriveUser)
+  03CA  4F            		LD		C, A
+                      	
+  03CB  C300DC        		JP		CpmCcprBaseAdrs
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  03CE                	CpmBiosWBoot:
+  03CE  AF            		XOR		A
+  03CF  D380          		OUT		(PortBiosWBoot), A
+                      	
+  03D1  18F4          		JR		CpmBiosExit
+                      	;/------------------------------------------------------------------------------/;
+  03D3                	CpmBiosConSt:
+  03D3  DB81          		IN		A, (PortBiosConSt)
+                      	
+  03D5  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  03D6                	CpmBiosConIn:
+  03D6  DB82          		IN		A, (PortBiosConIn)
+  03D8  FE00          		CP		NUL
+  03DA  28FA          		JR		Z, CpmBiosConIn
+                      	
+  03DC  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  03DD                	CpmBiosConOut:
+  03DD  79            		LD		A, C
+  03DE  D383          		OUT		(PortBiosConOut), A
+                      	
+  03E0  C9            		RET
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  03E1                	CpmBiosList:
+  03E1  79            		LD		A, C
+  03E2  D384          		OUT		(PortBiosList), A
+                      	
+  03E4  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  03E5                	CpmBiosPunch:
+  03E5  79            		LD		A, C
+  03E6  D385          		OUT		(PortBiosPunch), A
+                      	
+  03E8  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  03E9                	CpmBiosReader:
+  03E9  DB86          		IN		A, (PortBiosReader)
+                      	
+  03EB  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  03EC                	CpmBiosHome:
+  03EC  AF            		XOR		A
+  03ED  D387          		OUT		(PortBiosHome), A
+                      	
+  03EF  C9            		RET
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  03F0                	CpmBiosSelDsk:
+  03F0  2100FF        		LD		HL, CpmBiosBaseAdrs + DiskParamHead0 - CpmBiosEntry
+                      	
+  03F3  7C            		LD		A, H
+  03F4  D303          		OUT		(PortBiosParamH), A
+                      	
+  03F6  79            		LD		A, C
+  03F7  D388          		OUT		(PortBiosSelDsk), A
+                      	
+  03F9  DB03          		IN		A, (PortBiosParamH)
+  03FB  67            		LD		H, A
+                      	
+  03FC  DB02          		IN		A, (PortBiosParamL)
+  03FE  6F            		LD		L, A
+                      	
+  03FF  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  0400                	CpmBiosSetTrk:
+  0400  78            		LD		A, B
+  0401  D303          		OUT		(PortBiosParamH), A
+                      	
+  0403  79            		LD		A, C
+  0404  D389          		OUT		(PortBiosSetTrk), A
+                      	
+  0406  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  0407                	CpmBiosSetSec:
+  0407  78            		LD		A, B
+  0408  D303          		OUT		(PortBiosParamH), A
+                      	
+  040A  79            		LD		A, C
+  040B  D38A          		OUT		(PortBiosSetSec), A
+                      	
+  040D  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  040E                	CpmBiosSetDma:
+  040E  78            		LD		A, B
+  040F  D303          		OUT		(PortBiosParamH), A
+                      	
+  0411  79            		LD		A, C
+  0412  D38B          		OUT		(PortBiosSetDma), A
+                      	
+  0414  C9            		RET
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0415                	CpmBiosRead:
+  0415  AF            		XOR		A
+  0416  D38C          		OUT		(PortBiosRead), A
+                      	
+  0418  DB02          		IN		A, (PortBiosParamL)
+                      	
+  041A  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  041B                	CpmBiosWrite:
+  041B  79            		LD		A, C
+  041C  D38D          		OUT		(PortBiosWrite), A
+                      	
+  041E  DB02          		IN		A, (PortBiosParamL)
+                      	
+  0420  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  0421                	CpmBiosListSt:
+  0421  DB8E          		IN		A, (PortBiosListSt)
+                      	
+  0423  C9            		RET
+                      	;/------------------------------------------------------------------------------/;
+  0424                	CpmBiosSecTran:
+  0424  78            		LD		A, B
+  0425  D303          		OUT		(PortBiosParamH), A
+                      	
+  0427  79            		LD		A, C
+  0428  D38F          		OUT		(PortBiosSecTran), A
+                      	
+  042A  DB03          		IN		A, (PortBiosParamH)
+  042C  67            		LD		H, A
+                      	
+  042D  DB02          		IN		A, (PortBiosParamL)
+  042F  6F            		LD		L, A
+                      	
+  0430  C9            		RET
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0500                	ORG		0500H
+                      	;/------------------------------------------------------------------------------/;
+  0500                	BlockAlloc00:
+  0500                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0580                	BlockAlloc01:
+  0580                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0600                	BlockAlloc02:
+  0600                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0680                	BlockAlloc03:
+  0680                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0700                	BlockAlloc04:
+  0700                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0780                	BlockAlloc05:
+  0780                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0800                	BlockAlloc06:
+  0800                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0880                	BlockAlloc07:
+  0880                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0900                	BlockAlloc08:
+  0900                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0980                	BlockAlloc09:
+  0980                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0A00                	BlockAlloc0A:
+  0A00                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0A80                	BlockAlloc0B:
+  0A80                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0B00                	BlockAlloc0C:
+  0B00                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0B80                	BlockAlloc0D:
+  0B80                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0C00                	BlockAlloc0E:
+  0C00                		DS		AllocVectorSize
+                      	;/------------------------------------------------------------------------------/;
+  0C80                	BlockAlloc0F:
+  0C80                		DS		AllocVectorSize
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0D00                	ORG		0D00H
+                      	;/------------------------------------------------------------------------------/;
+  0D00                	DiskParamBlock:
+  0D00  0001          		DW		DiskSectorMax								;/	(SPT)SectorPerTrack
+                      	
+  0D02  05            		DB		05H											;/	(BSH)BlockShiftFactor
+  0D03  1F            		DB		1FH											;/	(BLM)AllocBlockMask
+  0D04  01            		DB		01H											;/	(EXM)ExtentMask
+                      	
+  0D05  FF03          		DW		DiskBlockMax - 1							;/	(DSM)DiskSizeMax
+  0D07  FF01          		DW		DiskEntryMax - 1							;/	(DRM)DirectoryMax
+                      	
+  0D09  F0            		DB		0F0H										;/	(AL0)AllocMask0
+  0D0A  00            		DB		00H											;/	(AL1)AllocMask1
+                      	
+  0D0B  0000          		DW		DirectoryCheckSize							;/	(CKS)DirectoryCheckSize
+  0D0D  0000          		DW		SystemTrackOffset							;/	(OFF)SystemTrackOffset
+                      	
+  0D0F  00            		DB		00H											;/	(NUL)Reserved
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0E00                	ORG		0E00H
+                      	;/------------------------------------------------------------------------------/;
+  0E00                	DiskParamHead0:
+  0E00  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E08  8000          		DW		SectorDmaBuffer
+  0E0A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E0C  0000          		DW		CheckSumVector
+  0E0E  00F6          		DW		CpmBiosBaseAdrs + BlockAlloc00    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E10                	DiskParamHead1:
+  0E10  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E18  8000          		DW		SectorDmaBuffer
+  0E1A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E1C  0000          		DW		CheckSumVector
+  0E1E  80F6          		DW		CpmBiosBaseAdrs + BlockAlloc01    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E20                	DiskParamHead2:
+  0E20  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E28  8000          		DW		SectorDmaBuffer
+  0E2A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E2C  0000          		DW		CheckSumVector
+  0E2E  00F7          		DW		CpmBiosBaseAdrs + BlockAlloc02    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E30                	DiskParamHead3:
+  0E30  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E38  8000          		DW		SectorDmaBuffer
+  0E3A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E3C  0000          		DW		CheckSumVector
+  0E3E  80F7          		DW		CpmBiosBaseAdrs + BlockAlloc03    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E40                	DiskParamHead4:
+  0E40  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E48  8000          		DW		SectorDmaBuffer
+  0E4A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E4C  0000          		DW		CheckSumVector
+  0E4E  00F8          		DW		CpmBiosBaseAdrs + BlockAlloc04    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E50                	DiskParamHead5:
+  0E50  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E58  8000          		DW		SectorDmaBuffer
+  0E5A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E5C  0000          		DW		CheckSumVector
+  0E5E  80F8          		DW		CpmBiosBaseAdrs + BlockAlloc05    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E60                	DiskParamHead6:
+  0E60  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E68  8000          		DW		SectorDmaBuffer
+  0E6A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E6C  0000          		DW		CheckSumVector
+  0E6E  00F9          		DW		CpmBiosBaseAdrs + BlockAlloc06    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E70                	DiskParamHead7:
+  0E70  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E78  8000          		DW		SectorDmaBuffer
+  0E7A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E7C  0000          		DW		CheckSumVector
+  0E7E  80F9          		DW		CpmBiosBaseAdrs + BlockAlloc07    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E80                	DiskParamHead8:
+  0E80  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E88  8000          		DW		SectorDmaBuffer
+  0E8A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E8C  0000          		DW		CheckSumVector
+  0E8E  00FA          		DW		CpmBiosBaseAdrs + BlockAlloc08    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0E90                	DiskParamHead9:
+  0E90  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0E98  8000          		DW		SectorDmaBuffer
+  0E9A  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0E9C  0000          		DW		CheckSumVector
+  0E9E  80FA          		DW		CpmBiosBaseAdrs + BlockAlloc09    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0EA0                	DiskParamHeadA:
+  0EA0  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0EA8  8000          		DW		SectorDmaBuffer
+  0EAA  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0EAC  0000          		DW		CheckSumVector
+  0EAE  00FB          		DW		CpmBiosBaseAdrs + BlockAlloc0A    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0EB0                	DiskParamHeadB:
+  0EB0  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0EB8  8000          		DW		SectorDmaBuffer
+  0EBA  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0EBC  0000          		DW		CheckSumVector
+  0EBE  80FB          		DW		CpmBiosBaseAdrs + BlockAlloc0B    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0EC0                	DiskParamHeadC:
+  0EC0  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0EC8  8000          		DW		SectorDmaBuffer
+  0ECA  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0ECC  0000          		DW		CheckSumVector
+  0ECE  00FC          		DW		CpmBiosBaseAdrs + BlockAlloc0C    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0ED0                	DiskParamHeadD:
+  0ED0  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0ED8  8000          		DW		SectorDmaBuffer
+  0EDA  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0EDC  0000          		DW		CheckSumVector
+  0EDE  80FC          		DW		CpmBiosBaseAdrs + BlockAlloc0D    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0EE0                	DiskParamHeadE:
+  0EE0  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0EE8  8000          		DW		SectorDmaBuffer
+  0EEA  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0EEC  0000          		DW		CheckSumVector
+  0EEE  00FD          		DW		CpmBiosBaseAdrs + BlockAlloc0E    - CpmBiosEntry
+                      	;/------------------------------------------------------------------------------/;
+  0EF0                	DiskParamHeadF:
+  0EF0  00000000000000		DW		SectorTransTable, 0000H, 0000H, 0000H
+  0EF8  8000          		DW		SectorDmaBuffer
+  0EFA  00FE          		DW		CpmBiosBaseAdrs + DiskParamBlock  - CpmBiosEntry
+  0EFC  0000          		DW		CheckSumVector
+  0EFE  80FD          		DW		CpmBiosBaseAdrs + BlockAlloc0F    - CpmBiosEntry
+                      	;/==============================================================================/;
+                      	
+                      	
+                      	;/==============================================================================/;
+  0F00                		END
+

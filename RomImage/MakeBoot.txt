@@ -1,0 +1,4 @@
+
+ZASM64 BootRom -LBootRom.LST
+Hex2Rom < BootRom.HEX > BootRom.txt
+
