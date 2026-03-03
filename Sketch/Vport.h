@@ -45,6 +45,8 @@ static Sint08 IsPioStandBy(void);
 //==============================================================================//
 static Sint08 iCurrPioMode;								//	現行PIOモード
 static Sint08 iReleaseCpuBus;							//	CPUバス開放
+//------------------------------------------------------------------------------//
+static Uint16 iRomTransAdrs;							//	ROM転送アドレス
 //==============================================================================//
 
 
@@ -824,10 +826,13 @@ static void VportHistory(void) {
 
 //==============================================================================//
 static void VportInit(void) {
-	if(Esp32Master)		{	iCurrPioMode = PioModeStandBy;	iPioPortBus = 0x00;					}
-	else				{	iCurrPioMode = PioModeSlave;	iPioPortBus = PortStandBySlave;		}
+	if(Esp32Master)		iCurrPioMode = PioModeStandBy;
+	else				iCurrPioMode = PioModeSlave;
 
-	iReleaseCpuBus = True;	iPioDataBus = 0x00;
+	iPioPortBus = PortStandBySlave;
+	iPioDataBus = 0x00;
+
+	iReleaseCpuBus = True;	iRomTransAdrs = 0x0000;
 	iPioHistD01 = iPioHistD02 = iPioHistD03 = 0x00;
 }
 //------------------------------------------------------------------------------//

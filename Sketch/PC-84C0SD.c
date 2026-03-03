@@ -19,8 +19,8 @@ void setup(void) {
 
 	MatrixInit();
 	VportInit();
-	SpiLcdInit(False);
 	ResetInit();
+	SpiLcdInit(False);
 }
 //------------------------------------------------------------------------------//
 void loop(void) {
@@ -31,8 +31,8 @@ void loop(void) {
 
 	MatrixMove();
 	VportMove();
-	SpiLcdMove();
 	ResetMove();
+	SpiLcdMove();
 }
 //==============================================================================//
 

@@ -24,7 +24,6 @@
 #define		CpuCtrlRD					0x01			//	CPU制御ビット（RD）
 //------------------------------------------------------------------------------//
 static Sint08 iResetRequest;							//	リセット要求
-static Uint16 iRomTransAdrs;							//	ROM転送アドレス
 //==============================================================================//
 
 
@@ -121,7 +120,6 @@ static void ResetInit(void) {
 	ResetCtrl(False);
 
 	iResetRequest = True;
-	iRomTransAdrs = 0x0000;
 }
 //------------------------------------------------------------------------------//
 static void ResetMove(void) {
