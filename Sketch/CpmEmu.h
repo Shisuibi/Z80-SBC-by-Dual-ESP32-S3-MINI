@@ -299,7 +299,7 @@ static Uint08 SpiSdcAutoExecFile(void) {
 
 //==============================================================================//
 static void SpiSdcMultiDisp(Uint08 iData) {
-	delayMicroseconds((1000000 * SerialSegSizeTx) / (SerialBaudRateTx >> 3));
+	while(TransInterval() == False);
 	MultiKeep(iData);	MultiSend();	TransData(iData);	TransWrite();
 }
 //------------------------------------------------------------------------------//

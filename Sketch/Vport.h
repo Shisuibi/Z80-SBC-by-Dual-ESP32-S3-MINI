@@ -62,8 +62,9 @@ static void VportMakeDisk(void) {
 		iRomTransAdrs++;
 	} else {
 		if((iCpmBiosParamH == '1')||(iCpmBiosParamH == '2')) {
-			iCpmBiosParamL = iPioDataBus;
-			LcdModeLow();	iCurrCpmMode = CpmModeMakeDisk;
+			if(Esp32Master) iReleaseCpuBus = False;
+			iCpmBiosParamL = iPioDataBus;	iCurrCpmMode = CpmModeMakeDisk;
+			LcdModeLow();	CtrlKeyLow();
 		}
 	}
 }
@@ -584,8 +585,7 @@ static void VportBiosRead(void) {
 	if(PioInput) iPioDataBus = 0x00;
 	else {
 		if(Esp32Master) iReleaseCpuBus = False;
-		iCurrCpmMode = CpmModeSecRead;
-		iCpmBiosParamL = 0x00;
+		iCpmBiosParamL = 0x00;	iCurrCpmMode = CpmModeSecRead;
 	}
 }
 //------------------------------------------------------------------------------//
@@ -593,8 +593,7 @@ static void VportBiosWrite(void) {
 	if(PioInput) iPioDataBus = 0x00;
 	else {
 		if(Esp32Master) iReleaseCpuBus = False;
-		iCurrCpmMode = CpmModeSecWrite;
-		iCpmBiosParamL = 0x00;
+		iCpmBiosParamL = 0x00;	iCurrCpmMode = CpmModeSecWrite;
 	}
 }
 //------------------------------------------------------------------------------//

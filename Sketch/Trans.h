@@ -162,7 +162,7 @@ static Uint16 iSerialTxWr, iSerialTxRd;					//	シリアル参照（送信）
 static Uint08 aiSerialBufRx[SerialBufSizeRx];			//	シリアル緩衝（受信）
 static Uint08 aiSerialBufTx[SerialBufSizeTx];			//	シリアル緩衝（送信）
 //------------------------------------------------------------------------------//
-static Uint16 iHelpTextCount;							//	ヘルプ画面表示番号
+static Uint08 iHelpTextCount;							//	ヘルプ画面表示番号
 static Sint08 iBleAdvtReq;								//	BLE接続広告要求
 
 static Uint32 iSerialMicros;							//	通信端末マイクロ秒
@@ -259,7 +259,7 @@ static void TransCtrlKey(void) {
 }
 //------------------------------------------------------------------------------//
 static void TransHelpText(void) {
-	if(iHelpTextCount == 0xFFFF) iHelpTextCount = 0x0000;
+	if(iHelpTextCount == 0xFF) iHelpTextCount = 0x00;
 }
 //------------------------------------------------------------------------------//
 static void TransClrScrn(void) {
@@ -348,37 +348,45 @@ static void TransBleStart(void) {
 	pBleService->start();
 }
 //------------------------------------------------------------------------------//
+static Sint08 TransInterval(void) {
+	if(		(micros() - iSerialMicros) >
+			((1000000 * SerialSegSizeTx) / (SerialBaudRateTx >> 3))		) return(True);
+
+	return(False);
+}
+//------------------------------------------------------------------------------//
 static void TransWrite(void) {
-	Uint32 iInterval, iMicros = micros();
-	Uint08 *pData;	Uint16 iSize;
+	Uint08 *pData;
+	Uint16 iSize;
 
-	iInterval = (1000000 * SerialSegSizeTx) / (SerialBaudRateTx >> 3);
+	if((iSerialTxWr != iSerialTxRd)&&(TransInterval() != False)) {
+		if((iSize = SerialBufMaskTx(iSerialTxWr - iSerialTxRd)) > SerialSegSizeTx)
+			iSize = SerialSegSizeTx;
+		if((iSerialTxRd < (SerialBufSizeTx - 1))&&((iSerialTxRd + iSize) >= SerialBufSizeTx))
+			iSize = SerialBufSizeTx - iSerialTxRd - 1;
 
-	if(iSerialTxWr != iSerialTxRd) {
-		if((iMicros - iSerialMicros) > iInterval) {
-			iSerialMicros = iMicros;
+		pData = &(aiSerialBufTx[SerialBufMaskTx(iSerialTxRd + 1)]);
+		iUartTxData = *pData;	Serial.write(pData, iSize);
 
-			if((iSize = SerialBufMaskTx(iSerialTxWr - iSerialTxRd)) > SerialSegSizeTx)
-				iSize = SerialSegSizeTx;
-			if((iSerialTxRd < (SerialBufSizeTx - 1))&&((iSerialTxRd + iSize) >= SerialBufSizeTx))
-				iSize = SerialBufSizeTx - iSerialTxRd - 1;
-
-			pData = &(aiSerialBufTx[SerialBufMaskTx(iSerialTxRd + 1)]);
-			iUartTxData = *pData;	Serial.write(pData, iSize);
-
-			if((Esp32Master)&&(BleUartRead() != False)) {
-				pBleCharaTx->setValue(pData, iSize);
-				pBleCharaTx->notify();
-			}
-
-			iSerialTxRd = SerialBufMaskTx(iSerialTxRd + iSize);
+		if((Esp32Master)&&(BleUartRead() != False)) {
+			pBleCharaTx->setValue(pData, iSize);
+			pBleCharaTx->notify();
 		}
+
+		iSerialTxRd = SerialBufMaskTx(iSerialTxRd + iSize);
+		iSerialMicros = micros();
+	}
+
+	if((iHelpTextCount != 0xFF)&&(TransInterval() != False)) {
+		if(apAssignHelpText[iHelpTextCount] != NULL)	TransMessage(apAssignHelpText[iHelpTextCount++]);
+		else											iHelpTextCount = 0xFF;
+
+		iSerialMicros = micros();
 	}
 }
 //------------------------------------------------------------------------------//
 static void TransRead(void) {
 	Sint16 i;
-	Uint08 iLine;
 
 	for(i = 0;i < SerialSegSizeTx;i++) {
 		if(Serial.available() == 0) break;
@@ -386,11 +394,6 @@ static void TransRead(void) {
 	}
 
 	if((SdcBusyRead() == False)&&(Esp32Slave)) MultiSend();
-	if(iHelpTextCount == 0xFFFF) return;
-
-	if(apAssignHelpText[iLine = (Uint08)(iHelpTextCount >> 8)] != NULL) {
-		if((iHelpTextCount++ & 0x00FF) == 0) TransMessage(apAssignHelpText[iLine]);
-	} else iHelpTextCount = 0xFFFF;
 }
 //==============================================================================//
 
@@ -406,7 +409,7 @@ static void TransInit(void) {
 	TransClear();
 
 	if(Esp32Master) TransBleStart();
-	iHelpTextCount = 0xFFFF;	iBleAdvtReq = True;		iSerialMicros = micros();
+	iHelpTextCount = 0xFF;	iBleAdvtReq = True;		iSerialMicros = micros();
 }
 //------------------------------------------------------------------------------//
 static void TransMove(void) {
