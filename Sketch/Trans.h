@@ -164,7 +164,6 @@ static Uint08 aiSerialBufTx[SerialBufSizeTx];			//	シリアル緩衝（送信）
 //------------------------------------------------------------------------------//
 static Uint08 iHelpTextCount;							//	ヘルプ画面表示番号
 static Sint08 iBleAdvtReq;								//	BLE接続広告要求
-
 static Uint32 iSerialMicros;							//	通信端末マイクロ秒
 //------------------------------------------------------------------------------//
 static BLEServer* pBleServer;							//	BLEサーバー識別子
@@ -332,6 +331,8 @@ class BleCharaCB: public BLECharacteristicCallbacks {
 static void TransClear(void) {
 	iSerialRxWr = iSerialRxRd = 0;
 	iSerialTxWr = iSerialTxRd = 0;
+
+	iHelpTextCount = 0xFF;
 }
 //------------------------------------------------------------------------------//
 static void TransBleStart(void) {
@@ -405,11 +406,11 @@ static void TransInit(void) {
 	Serial.setTxBufferSize(SerialBufSizeTx);
 	Serial.begin(SerialBaudRateTx, SERIAL_8N1, GpioUa0Rxd, GpioUa0Txd);
 
-	delay(500);		MultiFlush();	delay(500);
 	TransClear();
+	iBleAdvtReq = True;
 
+	iSerialMicros = micros();
 	if(Esp32Master) TransBleStart();
-	iHelpTextCount = 0xFF;	iBleAdvtReq = True;		iSerialMicros = micros();
 }
 //------------------------------------------------------------------------------//
 static void TransMove(void) {

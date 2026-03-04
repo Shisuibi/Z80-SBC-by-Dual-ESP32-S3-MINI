@@ -23,6 +23,8 @@
 #define		CpuCtrlWR					0x02			//	CPU制御ビット（WR）
 #define		CpuCtrlRD					0x01			//	CPU制御ビット（RD）
 //------------------------------------------------------------------------------//
+#define		ResetExecMode				0x02			//	リセット実行モード
+//------------------------------------------------------------------------------//
 static Sint08 iResetRequest;							//	リセット要求
 //==============================================================================//
 
@@ -123,7 +125,7 @@ static void ResetInit(void) {
 }
 //------------------------------------------------------------------------------//
 static void ResetMove(void) {
-	if(iResetRequest == False) return;
+	if(iResetRequest != ResetExecMode) return;
 
 	ResetGpio(True);
 	ResetCtrl(True);

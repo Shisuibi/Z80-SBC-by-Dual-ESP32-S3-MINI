@@ -211,6 +211,9 @@ static void MultiMove(void) {
 	if(iResetRequest != False) {
 		MultiData(CodeTelSynchWait);
 		MultiWait(CodeTelSynchWait);
+
+		delay(100);		MultiFlush();	delay(100);
+		iResetRequest = ResetExecMode;
 	}
 
 	MultiWait(0xFF);

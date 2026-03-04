@@ -26,7 +26,7 @@ enum {
 #define		PortStandBySlave			0x0F			//	PIOポート（隷属待機）
 
 #define		PortUartCtrl				0x30			//	PIOポート（UART制御）
-#define		PortUartData				0x31			//	PIOポート（UARTデータ）
+#define		PortBiosConSt				0x81			//	PIOポート（UART制御）
 //------------------------------------------------------------------------------//
 #define		PioInput	(iCurrPioMode == PioModeInput )		//	PIOモード（入力）
 #define		PioOutput	(iCurrPioMode == PioModeOutput)		//	PIOモード（出力）
@@ -811,7 +811,7 @@ static void VportHistory(void) {
 			if(		((PioHistRead() & 0x01)&&((iCpuCtrlBit & CpuCtrlMREQ) != 0))||
 					((PioHistRead() & 0x02)&&((iCpuCtrlBit & CpuCtrlIORQ) != 0))	) {
 				if(		(PioHistRead() & 0x01)||
-						((iCpuPortBus != PortUartCtrl)&&(iCpuPortBus != PortUartData))	) {
+						((iCpuPortBus != PortUartCtrl)&&(iCpuPortBus != PortBiosConSt))		) {
 					MultiData(CodeTelPioHist);
 					MultiData(iPioHistD01 = iCpuPortBus);	MultiData(iPioHistD02 = iCpuDataBus);
 					MultiData(iPioHistD03 = (iPioHistD03 & 0x30) | (iCpuCtrlBit & 0x0F));
@@ -836,6 +836,8 @@ static void VportInit(void) {
 }
 //------------------------------------------------------------------------------//
 static void VportMove(void) {
+	if(iResetRequest != False) return;
+
 	if(Esp32Master) VportShift();
 	while((* apVportPioMode[iCurrPioMode])());
 	if(Esp32Master) VportHistory();
