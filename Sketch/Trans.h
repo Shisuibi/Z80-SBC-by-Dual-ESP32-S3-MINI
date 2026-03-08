@@ -293,10 +293,8 @@ static void TransCheck(Uint08 iData) {
 		}
 	}
 
-	if(SdcBusyRead() == False) {
-		if(Esp32Master)		RecepData(iData);
-		else				MultiKeep(iData);
-	}
+	if(Esp32Master)		RecepData(iData);
+	else				MultiKeep(iData);
 }
 //==============================================================================//
 
@@ -394,7 +392,7 @@ static void TransRead(void) {
 		TransCheck(Serial.read());
 	}
 
-	if((SdcBusyRead() == False)&&(Esp32Slave)) MultiSend();
+	if(Esp32Slave) MultiSend();
 }
 //==============================================================================//
 

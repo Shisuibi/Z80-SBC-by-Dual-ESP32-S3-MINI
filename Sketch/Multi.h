@@ -212,7 +212,7 @@ static void MultiMove(void) {
 		MultiData(CodeTelSynchWait);
 		MultiWait(CodeTelSynchWait);
 
-		MultiFlush();	delay(500);
+		MultiFlush();	delay(100);
 		iResetRequest = ResetModeBootExec;
 	}
 
