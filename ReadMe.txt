@@ -476,6 +476,11 @@
 　今まで大変お世話になったGrant Searle氏のNascom ROM BASICは、
 　トランジェントコマンドROMBASIC.COMとして残しておきましたｗ
 
+　（ROMBASICはBIOS領域も上書きするので注意）
+　CP/Mに戻るには「Ctrl＋A（システム再起動）→発振φ選択」の順に操作して下さい
+　ROMBASIC起動後の「Memory top?」で61952（F200H）未満の値を入力しておけば、
+　MONITORまたはRESETコマンドで正常にCP/Mへ戻る事が出来ます
+
 　【メモリマップ】
 
 　　0000H ＋――――＋
@@ -574,7 +579,7 @@
 
 　Ctrlキー操作によるBASICファイルの読込は廃止されました
 　ROMBASICでは入出力ポート36Hに呼出番号を出力して下さい
-　CP/M版のMBASICではRUNまたはLOADコマンドも利用出来ます
+　CP/M版のMBASICではLOADまたはRUNコマンドも利用出来ます
 
 　OUT &H36,0　｜　SDカード読込（スーパースタートレック）
 　OUT &H36,1　｜　SDカード読込（スタートレック説明書）
