@@ -30,9 +30,9 @@
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/lcdslogo.png" ALT="起動ロゴ画面" WIDTH="480">
 		</TD><TD ROWSPAN="3">
-			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/helptext.png" ALT="HelpText" WIDTH="480">
-			<BR>
 			<IMG SRC="https://crystalpalace.web.fc2.com/document/z84c00catchum.png" ALT="Z84C00 CatChum" WIDTH="480">
+			<BR>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/helptext.png" ALT="HelpText" WIDTH="480">
 		</TD></TR>
 		<TR><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/document/z84c00cpm22.png" ALT="Z84C00 CP/M 2.2" WIDTH="480">
