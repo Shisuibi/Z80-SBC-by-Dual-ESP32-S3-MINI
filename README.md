@@ -38,15 +38,11 @@
 			<IMG SRC="https://crystalpalace.web.fc2.com/document/z84c00cpm22.png" ALT="Z84C00 CP/M 2.2" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/segment.png" ALT="セグメント画面" WIDTH="480">
-		</TD><TD>
-			<BR>
 		</TD></TR>
 		<TR><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/mandel.png" ALT="Mandel" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/mandel.png" ALT="グラフィック画面" WIDTH="480">
-		</TD><TD>
-			<BR>
 		</TD></TR>
 	</TABLE></DIV>
 </HTML>
