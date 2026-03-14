@@ -285,7 +285,7 @@ enum {
 #define		PioHistRead()				(	iSysModeBit & 0x03	)
 
 #define		PioHistWrite(iPioHist)		{	iSysModeBit = (iSysModeBit & 0xFC) |	\
-											(iPioHist & 0x03);	}
+											((iPioHist) & 0x03);	}
 //------------------------------------------------------------------------------//
 #define		ClkModeWrite(iClkMode)		{	iSysModeBit = (iSysModeBit & 0x83) |	\
 											(asClockInfo[iClkMode].iDisp);		}

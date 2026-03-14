@@ -12,6 +12,8 @@
 
 //==============================================================================//
 #define		MatrixStackMax				16				//	行列演算スタック上限
+//------------------------------------------------------------------------------//
+#define		DegToRad(fAng)	(2.0 * PI * ((fAng) / 360.0))	//	度数弧度変換
 //==============================================================================//
 
 
@@ -60,8 +62,8 @@ static void MatrixUnit(void) {
 	}
 }
 //------------------------------------------------------------------------------//
-static void MatrixPers(Sflt32 fAng, Sflt32 fNea, Sflt32 fFar) {
-	Sflt32 fPer = 1.0 / tan(PI * (fAng / 360.0));
+static void MatrixPers(Sflt32 fRad, Sflt32 fNea, Sflt32 fFar) {
+	Sflt32 fPer = 1.0 / tan(fRad / 2.0);
 	Sflt32 fDis = fFar - fNea;
 	Sflt32 (* pMat)[XYZW] = afMatrixStack[iCurrMatrix];
 
@@ -70,6 +72,71 @@ static void MatrixPers(Sflt32 fAng, Sflt32 fNea, Sflt32 fFar) {
 	pMat[Z][X] = 0.0;	pMat[Z][Y] = 0.0;	pMat[Z][Z] = (fFar + fNea) / fDis;			pMat[Z][W] = 1.0;
 	pMat[W][X] = 0.0;	pMat[W][Y] = 0.0;	pMat[W][Z] = -(2.0 * fFar * fNea) / fDis;	pMat[W][W] = 0.0;
 }
+//------------------------------------------------------------------------------//
+static void MatrixTrans(Sflt32* pVec) {
+	Sflt32 (* pMat)[XYZW] = afMatrixStack[iCurrMatrix];
+
+	pMat[W][X] = pVec[X] * pMat[X][X] + pVec[Y] * pMat[Y][X] + pVec[Z] * pMat[Z][X] + pVec[W] * pMat[W][X];
+	pMat[W][Y] = pVec[X] * pMat[X][Y] + pVec[Y] * pMat[Y][Y] + pVec[Z] * pMat[Z][Y] + pVec[W] * pMat[W][Y];
+	pMat[W][Z] = pVec[X] * pMat[X][Z] + pVec[Y] * pMat[Y][Z] + pVec[Z] * pMat[Z][Z] + pVec[W] * pMat[W][Z];
+	pMat[W][W] = pVec[X] * pMat[X][W] + pVec[Y] * pMat[Y][W] + pVec[Z] * pMat[Z][W] + pVec[W] * pMat[W][W];
+}
+//------------------------------------------------------------------------------//
+static void MatrixRotateX(Sflt32 fRad) {
+	Sflt32 (* pMat)[XYZW] = afMatrixStack[iCurrMatrix];
+	Sflt32 fTmp, fSin = sin(fRad), fCos = cos(fRad);
+
+	fTmp = pMat[Y][X];	pMat[Y][X] = fCos * fTmp + fSin * pMat[Z][X];
+						pMat[Z][X] = fCos * pMat[Z][X] - fSin * fTmp;
+
+	fTmp = pMat[Y][Y];	pMat[Y][Y] = fCos * fTmp + fSin * pMat[Z][Y];
+						pMat[Z][Y] = fCos * pMat[Z][Y] - fSin * fTmp;
+
+	fTmp = pMat[Y][Z];	pMat[Y][Z] = fCos * fTmp + fSin * pMat[Z][Z];
+						pMat[Z][Z] = fCos * pMat[Z][Z] - fSin * fTmp;
+
+	fTmp = pMat[Y][W];	pMat[Y][W] = fCos * fTmp + fSin * pMat[Z][W];
+						pMat[Z][W] = fCos * pMat[Z][W] - fSin * fTmp;
+}
+//------------------------------------------------------------------------------//
+static void MatrixRotateY(Sflt32 fRad) {
+	Sflt32 (* pMat)[XYZW] = afMatrixStack[iCurrMatrix];
+	Sflt32 fTmp, fSin = sin(fRad), fCos = cos(fRad);
+
+	fTmp = pMat[X][X];	pMat[X][X] = fCos * fTmp - fSin * pMat[Z][X];
+						pMat[Z][X] = fCos * pMat[Z][X] + fSin * fTmp;
+
+	fTmp = pMat[X][Y];	pMat[X][Y] = fCos * fTmp - fSin * pMat[Z][Y];
+						pMat[Z][Y] = fCos * pMat[Z][Y] + fSin * fTmp;
+
+	fTmp = pMat[X][Z];	pMat[X][Z] = fCos * fTmp - fSin * pMat[Z][Z];
+						pMat[Z][Z] = fCos * pMat[Z][Z] + fSin * fTmp;
+
+	fTmp = pMat[X][W];	pMat[X][W] = fCos * fTmp - fSin * pMat[Z][W];
+						pMat[Z][W] = fCos * pMat[Z][W] + fSin * fTmp;
+}
+//------------------------------------------------------------------------------//
+static void MatrixRotateZ(Sflt32 fRad) {
+	Sflt32 (* pMat)[XYZW] = afMatrixStack[iCurrMatrix];
+	Sflt32 fTmp, fSin = sin(fRad), fCos = cos(fRad);
+
+	fTmp = pMat[X][X];	pMat[X][X] = fCos * fTmp + fSin * pMat[Y][X];
+						pMat[Y][X] = fCos * pMat[Y][X] - fSin * fTmp;
+
+	fTmp = pMat[X][Y];	pMat[X][Y] = fCos * fTmp + fSin * pMat[Y][Y];
+						pMat[Y][Y] = fCos * pMat[Y][Y] - fSin * fTmp;
+
+	fTmp = pMat[X][Z];	pMat[X][Z] = fCos * fTmp + fSin * pMat[Y][Z];
+						pMat[Y][Z] = fCos * pMat[Y][Z] - fSin * fTmp;
+
+	fTmp = pMat[X][W];	pMat[X][W] = fCos * fTmp + fSin * pMat[Y][W];
+						pMat[Y][W] = fCos * pMat[Y][W] - fSin * fTmp;
+}
+//------------------------------------------------------------------------------//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //==============================================================================//
 
 
@@ -127,7 +194,7 @@ static void MatrixCalc(void) {
 		afCalcVertex[1][i] = 0.0;
 
 		for(j = 0;j < XYZW;j++) {
-			afCalcVertex[1][i] += pMat[j][i] * afCalcVertex[0][j];
+			afCalcVertex[1][i] += afCalcVertex[0][j] * pMat[j][i];
 		}
 	}
 }
@@ -198,7 +265,7 @@ static void MatrixInit(void) {
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 /*@@@@
 	MatrixGraphic();
-	MatrixPers(90.0, 1.0, 100.0);
+	MatrixPers(DegToRad(90.0), 1.0, 100.0);
 	MatrixPrint();
 	MatrixVertex();
 @@@@*/
