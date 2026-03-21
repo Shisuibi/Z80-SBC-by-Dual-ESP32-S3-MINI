@@ -1,3 +1,4 @@
+
 <HTML>
 	<DIV ALIGN="Center" STYLE="Width:100%;"><TABLE>
 		<TR><TD ALIGN="Center" COLSPAN="3">
@@ -19,14 +20,21 @@
 			<IMG SRC="https://crystalpalace.web.fc2.com/overview/pcbdesign01.png" ALT="基板設計" WIDTH="480">
 		</TD></TR>
 		<TR><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/startrek.png" ALT="StarTrek" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/download/makedisk.png" ALT="MakeDisk呼出" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/gallery/exterior.jpg" ALT="実機外観" WIDTH="480">
 		</TD><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/melody.png" ALT="Melody" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/document/z84c00cpm22.png" ALT="Z84C00 CP/M 2.2" WIDTH="480">
 		</TD></TR>
 		<TR><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/download/makedisk.png" ALT="MakeDisk呼出" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/startrek.png" ALT="StarTrek" WIDTH="480">
+		</TD><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/document/z80mobile.jpg" ALT="Z80モバイル環境" WIDTH="480">
+		</TD><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/trekinst.png" ALT="TrekInst" WIDTH="480">
+		</TD></TR>
+		<TR><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/romdump.png" ALT="RomDump" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/lcdslogo.png" ALT="起動ロゴ画面" WIDTH="480">
 		</TD><TD ROWSPAN="3">
@@ -35,7 +43,7 @@
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/helptext.png" ALT="HelpText" WIDTH="480">
 		</TD></TR>
 		<TR><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/document/z84c00cpm22.png" ALT="Z84C00 CP/M 2.2" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/knightrider.png" ALT="KnightRider" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/segment.png" ALT="セグメント画面" WIDTH="480">
 		</TD></TR>
@@ -43,6 +51,13 @@
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/mandel.png" ALT="Mandel" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/mandel.png" ALT="グラフィック画面" WIDTH="480">
+		</TD></TR>
+		<TR><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/clocktimer.png" ALT="ClockTimer" WIDTH="480">
+		</TD><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/neopixel.png" ALT="NeoPixel" WIDTH="480">
+		</TD><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/melody.png" ALT="Melody" WIDTH="480">
 		</TD></TR>
 	</TABLE></DIV>
 </HTML>
