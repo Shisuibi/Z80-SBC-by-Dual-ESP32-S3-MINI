@@ -13,6 +13,9 @@
 //==============================================================================//
 #define		LcdScrnPixelX				480				//	液晶表示画面ピクセル（横）
 #define		LcdScrnPixelY				320				//	液晶表示画面ピクセル（縦）
+
+#define		LcdCnvsPixelX	((LcdScrnPixelX * 3) >> 2)	//	液晶表示画布ピクセル（横）
+#define		LcdCnvsPixelY	((LcdScrnPixelY * 3) >> 2)	//	液晶表示画布ピクセル（縦）
 //------------------------------------------------------------------------------//
 #define		LcdStdRotation				1				//	液晶表示回転方向（基準値）
 #define		LcdSegInterval				15625			//	液晶表示更新間隔（64[Hz]）
@@ -487,7 +490,7 @@ static void SpiLcdInit(Sint08 iReset) {
 
 	if(iReset == False) {
 		SpiLCD.init();	SpiLCD.setSwapBytes(True);
-		Canvas.createSprite((LcdScrnPixelX * 3) >> 2, (LcdScrnPixelY * 3) >> 2);
+		Canvas.createSprite(LcdCnvsPixelX, LcdCnvsPixelY);
 	}
 
 	SpiLCD.setBrightness(iLcdBrightness);

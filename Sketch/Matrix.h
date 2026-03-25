@@ -154,6 +154,29 @@ static void MatrixRotateZ(Sflt32 fRad) {
 
 
 //==============================================================================//
+static void VectorInner(Sflt32* pInr, Sflt32* pV0, Sflt32* pV1, Sflt32* pV2) {
+	Sflt32 afVA[XYZ], afVB[XYZ];
+
+	afVA[X] = pV1[X] - pV0[X];	afVA[Y] = pV1[Y] - pV0[Y];	afVA[Z] = pV1[Z] - pV0[Z];
+	afVB[X] = pV2[X] - pV0[X];	afVB[Y] = pV2[Y] - pV0[Y];	afVB[Z] = pV2[Z] - pV0[Z];
+
+	*pInr = afVA[X] * afVB[X] + afVA[Y] * afVB[Y] + afVA[Z] * afVB[Z];
+}
+//------------------------------------------------------------------------------//
+static void VectorCross(Sflt32* pCrs, Sflt32* pV0, Sflt32* pV1, Sflt32* pV2) {
+	Sflt32 afVA[XYZ], afVB[XYZ];
+
+	afVA[X] = pV1[X] - pV0[X];	afVA[Y] = pV1[Y] - pV0[Y];	afVA[Z] = pV1[Z] - pV0[Z];
+	afVB[X] = pV2[X] - pV0[X];	afVB[Y] = pV2[Y] - pV0[Y];	afVB[Z] = pV2[Z] - pV0[Z];
+
+	pCrs[X] = afVA[Y] * afVB[Z] - afVA[Z] * afVB[Y];
+	pCrs[Y] = afVA[Z] * afVB[X] - afVA[X] * afVB[Z];
+	pCrs[Z] = afVA[X] * afVB[Y] - afVA[Y] * afVB[X];
+}
+//==============================================================================//
+
+
+//==============================================================================//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 static Sflt32 afModelVertex[8][XYZW] = {
@@ -183,18 +206,18 @@ static Uint08 aiModelPolygon[12][4] = {
 };
 //------------------------------------------------------------------------------//
 static Uint16 aiModelMaterial[12][2] = {
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
-	{	0x041F,		0x0000,		},
+	{	TFT_BLUE  ,		0x0000,		},
+	{	TFT_BLUE  ,		0x0000,		},
+	{	TFT_RED   ,		0x0000,		},
+	{	TFT_RED   ,		0x0000,		},
+	{	TFT_ORANGE,		0x0000,		},
+	{	TFT_ORANGE,		0x0000,		},
+	{	TFT_YELLOW,		0x0000,		},
+	{	TFT_YELLOW,		0x0000,		},
+	{	TFT_GREEN ,		0x0000,		},
+	{	TFT_GREEN ,		0x0000,		},
+	{	TFT_WHITE ,		0x0000,		},
+	{	TFT_WHITE ,		0x0000,		},
 };
 //------------------------------------------------------------------------------//
 //			6----7
@@ -237,22 +260,21 @@ static void MatrixVertex(void) {
 }
 //------------------------------------------------------------------------------//
 static void MatrixDraw(void) {
-	Sflt32* pV0, * pV1, * pV2;
+	Sflt32 afCrs[XYZ], * pV0, * pV1, * pV2;
 	Sint08 i;
 
-	SpiLCD.startWrite();
-	SpiLCD.fillScreen(iLcdRgbC1);
+	Canvas.fillScreen(iLcdRgbC1);
 
 	for(i = 0;i < 12;i++) {
 		pV0 = afCalcVertex[aiModelPolygon[i][0]];
 		pV1 = afCalcVertex[aiModelPolygon[i][1]];
 		pV2 = afCalcVertex[aiModelPolygon[i][2]];
 
-		SpiLCD.drawTriangle(	(Sint16)pV0[X], (Sint16)pV0[Y], (Sint16)pV1[X], (Sint16)pV1[Y],
-								(Sint16)pV2[X], (Sint16)pV2[Y], aiModelMaterial[i][0]	);
-	}
+		VectorCross(afCrs, pV0, pV2, pV1);
 
-	SpiLCD.endWrite();
+		if(afCrs[Z] < 0) Canvas.drawTriangle(	(Sint16)pV0[X], (Sint16)pV0[Y], (Sint16)pV1[X], (Sint16)pV1[Y],
+												(Sint16)pV2[X], (Sint16)pV2[Y], aiModelMaterial[i][0]	);
+	}
 }
 //------------------------------------------------------------------------------//
 static void MatrixPrint(void) {
@@ -292,15 +314,14 @@ static void MatrixModel(void) {
 
 	afCalcVertex[0][X] = 0.0;	afCalcVertex[0][Y] = 0.0;	afCalcVertex[0][Z] = 8.0;	afCalcVertex[0][W] = 1.0;
 	MatrixTrans(afCalcVertex[0]);
+	MatrixPush();	MatrixCopy();
 
 	MatrixRotateX(DegToRad(360.0 * ((Sflt32)iDeg   * 1.0 / 256.0)));
 	MatrixRotateY(DegToRad(360.0 * ((Sflt32)iDeg   * 2.0 / 256.0)));
 	MatrixRotateZ(DegToRad(360.0 * ((Sflt32)iDeg++ * 3.0 / 256.0)));
 
-	MatrixVertex();
-	MatrixPop();
-
-	MatrixDraw();
+	MatrixVertex();		MatrixPop();
+	MatrixDraw();		MatrixPop();
 };
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
@@ -315,26 +336,6 @@ static void MatrixModel(void) {
 //==============================================================================//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-static void MatrixGraphic(void) {
-	static Uint16 aiColor[4][6] = {
-		{	TFT_BLACK,	TFT_NAVY,		TFT_DARKGREEN,	TFT_DARKCYAN,	TFT_MAROON,		TFT_PURPLE,			},
-		{	TFT_OLIVE,	TFT_LIGHTGREY,	TFT_DARKGREY,	TFT_BLUE,		TFT_GREEN,		TFT_CYAN,			},
-		{	TFT_RED,	TFT_MAGENTA,	TFT_YELLOW,		TFT_WHITE,		TFT_ORANGE,		TFT_GREENYELLOW,	},
-		{	TFT_PINK,	TFT_BROWN,		TFT_GOLD,		TFT_SILVER,		TFT_SKYBLUE,	TFT_VIOLET,			},
-	};
-	Sint16 i, j;
-
-	SpiLCD.startWrite();
-
-	for(i = 0;i < 4;i++) {
-		for(j = 0;j < 6;j++) {
-			Canvas.writeFillRect(j * 60, i * 60, 60, 60, aiColor[i][j]);
-		}
-	}
-
-	SpiLCD.endWrite();
-}
-//------------------------------------------------------------------------------//
 static void MatrixFrameRate(void) {
 	static Uint32 iCount = 0;
 	static Uint32 iFrame = 0;
@@ -368,15 +369,11 @@ static void MatrixInit(void) {
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-/*@@@@
-	afCalcVertex[0][X] = (Sflt32)(LcdScrnPixelX >> 1);	afCalcVertex[0][Y] = (Sflt32)(LcdScrnPixelY >> 1);
+	afCalcVertex[0][X] = (Sflt32)(LcdCnvsPixelX >> 1);	afCalcVertex[0][Y] = (Sflt32)(LcdCnvsPixelY >> 1);
 	afCalcVertex[0][Z] = afCalcVertex[0][W] = 1.0;	MatrixTrans(afCalcVertex[0]);
 
-	afCalcVertex[0][Y] = -afCalcVertex[0][X];		MatrixScale(afCalcVertex[0]);
+	afCalcVertex[0][Y] = -(afCalcVertex[0][X]);		MatrixScale(afCalcVertex[0]);
 	MatrixPush();
-
-	MatrixGraphic();
-@@@@*/
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 }
