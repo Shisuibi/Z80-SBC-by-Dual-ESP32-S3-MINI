@@ -29,12 +29,12 @@
 		<TR><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/startrek.png" ALT="StarTrek" WIDTH="480">
 		</TD><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/document/z80mobile.jpg" ALT="Z80モバイル環境" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/gallery/schematic00.png" ALT="電子回路図00" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/trekinst.png" ALT="TrekInst" WIDTH="480">
 		</TD></TR>
 		<TR><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/romdump.png" ALT="RomDump" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/document/z80mobile.jpg" ALT="Z80モバイル環境" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/lcdslogo.png" ALT="起動ロゴ画面" WIDTH="480">
 		</TD><TD ROWSPAN="3">
@@ -53,7 +53,14 @@
 			<IMG SRC="https://crystalpalace.web.fc2.com/specific/mandel.png" ALT="グラフィック画面" WIDTH="480">
 		</TD></TR>
 		<TR><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/downmaze.png" ALT="DownMaze" WIDTH="480">
+		</TD><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/specific/z3dapi.png" ALT="Z3D API画面" WIDTH="480">
+		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/neopixel.png" ALT="NeoPixel" WIDTH="480">
+		</TD></TR>
+		<TR><TD>
+			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/romdump.png" ALT="RomDump" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/clocktimer.png" ALT="ClockTimer" WIDTH="480">
 		</TD><TD>
