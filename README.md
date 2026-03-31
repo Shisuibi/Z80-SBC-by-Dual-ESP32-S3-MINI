@@ -12,7 +12,7 @@
 		</TD></TR>
 		<TR><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/overview/pcbdesign00.png" ALT="配線設計" WIDTH="480">
-		</TD><TD ALIGN="Center">
+		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/gallery/schematic00.png" ALT="電子回路図00" WIDTH="480">
 			<BR>
 			<IMG SRC="https://crystalpalace.web.fc2.com/document/z84c00catchum.png" ALT="Z84C00 CatChum" WIDTH="480">
