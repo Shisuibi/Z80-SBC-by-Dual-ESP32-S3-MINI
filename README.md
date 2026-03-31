@@ -22,14 +22,14 @@
 		<TR><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/download/makedisk.png" ALT="MakeDisk呼出" WIDTH="480">
 		</TD><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/gallery/exterior.jpg" ALT="実機外観" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/gallery/interior.jpg" ALT="実機内観" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/document/z84c00cpm22.png" ALT="Z84C00 CP/M 2.2" WIDTH="480">
 		</TD></TR>
 		<TR><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/startrek.png" ALT="StarTrek" WIDTH="480">
 		</TD><TD>
-			<IMG SRC="https://crystalpalace.web.fc2.com/gallery/interior.jpg" ALT="実機内観" WIDTH="480">
+			<IMG SRC="https://crystalpalace.web.fc2.com/gallery/exterior.jpg" ALT="実機外観" WIDTH="480">
 		</TD><TD>
 			<IMG SRC="https://crystalpalace.web.fc2.com/instruct/trekinst.png" ALT="TrekInst" WIDTH="480">
 		</TD></TR>
