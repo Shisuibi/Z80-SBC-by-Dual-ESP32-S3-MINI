@@ -99,7 +99,7 @@ static Cint08* apSegBitName[3][3][10] = {				//	セグメントビット名
 		{	"WR",	"D7",	"D6",	"D5",	"D4",	"D3",	"D2",	"D1",	"D0",	"RD",	},	},
 };
 //------------------------------------------------------------------------------//
-static Uint08* apSegBitData[3][4] = {					//	セグメントビット現在
+static Uint08* apSegBitData[3][4] = {					//	セグメントビット現行
 	{	&(iSysInfoBit),		&(iSysModeBit),		&(iUartTxData),		&(iSysCtrlBit),		},
 	{	&(iAnyNumDt00),		&(iPioHistD01),		&(iPioHistD02),		&(iPioHistD03),		},
 	{	&(iCpuAdrsBus),		&(iCpuPortBus),		&(iCpuDataBus),		&(iCpuCtrlBit),		},
