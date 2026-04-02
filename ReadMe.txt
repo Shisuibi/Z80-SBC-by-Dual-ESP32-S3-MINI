@@ -19,8 +19,8 @@
 
 ★概要
 
-　Z80-SBC based on a 10cm square PCB designed with KiCad.
-　The CPU operates at a variable clock speed from 4Hz to 20MHz.
+　A Z80-SBC based on a 10cm square PCB designed with KiCad.
+　The CPU operates at a variable clock speed of 4Hz to 20MHz.
 　Input/output are handled by dual ESP32-S3 modules.
 　It has a USB wired connection to a PC and a BLE wireless connection to an iPhone.
 　It features an IPS-LCD panel, microSD card slot, and an 88-note melody buzzer, and runs on CP/M 2.2
@@ -331,7 +331,7 @@
 　　論理和をSRAMアドレスビット15～18とする事で、Z80が持つメモリ空間64[KB]の下位32[KB]を
 　　16ページ分のバンクメモリから切り替えて使う事が出来ます（上位32[KB]は常にページ15）
 
-　　CP/M 3.0のマルチタスク機能にも対応しています
+　　CP/M 3.0のマルチタスク機能にも対応可能です
 
 　【Dual ESP32-S3】
 　　CPUのCtrlBit・AdrsBus・DataBusの合計32ビットを取り込む際のピン不足を解消する為に、
@@ -586,7 +586,7 @@
 　Ctrl＋5　｜　発振φ（ 10[MHz]）　" 10[MHz]"
 　Ctrl＋6　｜　発振φ（　6[MHz]）　"　6[MHz]"
 
-　Ctrlキー操作によるBASICファイルの読込は廃止されました
+　BドライブにはBASIC言語のサンプルアプリが入っています
 　ROMBASICでは入出力ポート36Hに呼出番号を出力して下さい
 　CP/M版のMBASICではLOADまたはRUNコマンドも利用出来ます
 
