@@ -9,7 +9,7 @@ SdFat SD;
 #define SDINIT 9, SD_SCK_MHZ(SDMHZ)
 #define LED 0
 #define LEDinv 0
-#define BOARD "ESP32-S3-DevKitM/Zero"
+#define BOARD "ESP32-S3-DevKitM / Zero"
 #define board_esp32
 #define board_digital_io
 
