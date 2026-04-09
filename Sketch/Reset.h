@@ -95,16 +95,7 @@ static void ResetBoot(void) {
 		EspDmaPageAdrs();
 
 		for(j = iCpuPortBus = 0x00;j < 0x0100;j++, iCpuPortBus++) {
-			iCpuDataBus = pgm_read_byte(aiRomBootImage + 0x0000 + i++);
-			EspDmaWrite();
-		}
-	}
-
-	for(i = 0, iCpuAdrsBus = (CpmBiosBaseAdrs >> 8);i < RomBiosSize;iCpuAdrsBus++) {
-		EspDmaPageAdrs();
-
-		for(j = iCpuPortBus = 0x00;j < 0x0100;j++, iCpuPortBus++) {
-			iCpuDataBus = pgm_read_byte(aiRomBootImage + 0x0100 + i++);
+			iCpuDataBus = pgm_read_byte(aiRomBootImage + i++);
 			EspDmaWrite();
 		}
 	}

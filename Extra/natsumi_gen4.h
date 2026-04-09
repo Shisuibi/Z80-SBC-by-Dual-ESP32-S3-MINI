@@ -4,9 +4,14 @@
 // SPI_DRIVER_SELECT must be set to 0 in SdFat/SdFatConfig.h (default is 0)
 
 SdFat SD;
-#define SPIINIT 12,13,11,9 // sck, miso, mosi, cs
+#define LedS3DevKitM	48
+#define LedS3Zero		21
+#define SPIINIT	((iNeoPix == LedS3DevKitM)?12:12),\
+				((iNeoPix == LedS3DevKitM)?13:13),\
+				((iNeoPix == LedS3DevKitM)?11:11),\
+				((iNeoPix == LedS3DevKitM)? 9:10)				// sck, miso, mosi, cs
 #define SDMHZ 20
-#define SDINIT 9, SD_SCK_MHZ(SDMHZ)
+#define SDINIT	((iNeoPix == LedS3DevKitM)? 9:10), SD_SCK_MHZ(SDMHZ)
 #define LED 0
 #define LEDinv 0
 #define BOARD "ESP32-S3-DevKitM / Zero"
@@ -17,12 +22,12 @@ uint8 esp32bdos(uint16 dmaaddr) {
 	return(0x00);
 }
 
-void NeoPixWrite(uint8_t iLedPin, uint8_t iLedBit) {
-	static uint8_t iNeoPix = 0;
+static uint8_t iNeoPix = LED;
 
-	if(iNeoPix == 0) {
-		iNeoPix = 48;	pinMode(iNeoPix, INPUT_PULLDOWN);	//	ESP32-S3-DevKitM (Slave)
-		if(digitalRead(iNeoPix) == LOW) iNeoPix = 21;		//	ESP32-S3-Zero
+void NeoPixWrite(uint8_t iLedPin, uint8_t iLedBit) {
+	if(iNeoPix == LED) {
+		pinMode(iNeoPix = LedS3DevKitM, INPUT_PULLDOWN);		//	ESP32-S3-DevKitM (Slave)
+		if(digitalRead(iNeoPix) == LOW) iNeoPix = LedS3Zero;	//	ESP32-S3-Zero
 	}
 
 	if(iLedBit == LOW)	neopixelWrite(iNeoPix, 0x00, 0x00, 0x00);
