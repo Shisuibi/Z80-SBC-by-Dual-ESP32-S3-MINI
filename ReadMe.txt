@@ -53,7 +53,7 @@
 
 　【PC-84C0SD 20MHz　菜摘（なつみ）Gen4　2026年02月22日】
 　　https://crystalpalace.web.fc2.com/download/PC-84C0SD_20260222.zip
-　　https://github.com/Shisuibi/Z80-SBC_by_Dual_ESP32-S3-MINI
+　　https://github.com/Shisuibi/Z80-SBC_PC-84C0SD_20MHz
 
 
 ★ファイル一覧
