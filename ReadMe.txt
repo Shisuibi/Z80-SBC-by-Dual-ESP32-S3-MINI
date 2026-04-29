@@ -674,7 +674,7 @@
 　NeoPixel
 　　ESP32-S3-DevKitM-1に搭載されているRGB LEDを
 　　HSV空間で制御するプログラムです
-　　CPUクロックは2.5[MHz]または4[MHz]が
+　　CPUクロックは4[MHz]または8[MHz]が
 　　ムードライトっぽくて良いと思います
 
 　RomDump
