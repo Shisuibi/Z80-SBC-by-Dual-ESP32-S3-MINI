@@ -117,9 +117,12 @@ static void MatrixAmbiLight(void) {
 	if((fAmbiLight + fDiffLight) > 1.0) fDiffLight = 1.0 - fAmbiLight;
 }
 //------------------------------------------------------------------------------//
+static void MatrixDiffLight(void) {
+	if((fAmbiLight + fDiffLight) > 1.0) fAmbiLight = 1.0 - fDiffLight;
+}
+//------------------------------------------------------------------------------//
 static void MatrixParaLight(Sflt32* pVec) {
 	Sint08 i;
-	if((fAmbiLight + fDiffLight) > 1.0) fAmbiLight = 1.0 - fDiffLight;
 
 	for(i = 0;i < XYZW;i++) afParaLight[i] = pVec[i];
 	MatrixVecUnit(afParaLight);
