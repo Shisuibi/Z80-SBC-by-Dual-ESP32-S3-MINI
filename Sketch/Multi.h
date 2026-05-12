@@ -22,6 +22,8 @@ enum {
 	CodeTelSerData  ,									//	電文コード（通信端末データ）
 	CodeTelBleUart  ,									//	電文コード（BLE通信状態）
 	CodeTelSdcBusy  ,									//	電文コード（SDカード状態）
+	CodeTelZ3dFlush ,									//	電文コード（Z3D画面更新）
+	CodeTelZ3dPoly  ,									//	電文コード（Z3D多角描画）
 	CodeTelPioOutput,									//	電文コード（CPU出力命令）
 	CodeTelBnkPage  ,									//	電文コード（RAM下位バンク）
 	CodeTelPioHist  ,									//	電文コード（CPU入出力履歴）
@@ -157,6 +159,28 @@ static void MultiSdcBusy(void) {
 	SdcBusyLow();
 }
 //------------------------------------------------------------------------------//
+static void MultiZ3dFlush(void) {
+	MultiData(CodeTelZ3dFlush);
+	MatrixFlushScreen();
+}
+//------------------------------------------------------------------------------//
+static void MultiZ3dPoly(void) {
+	Uint08 iCount = MultiRecep();
+	Sint16 i;
+	TriInfo sTriangle;
+
+	i = sizeof(TriInfo) * iCount;
+	while(Serial1.available() < i);
+
+	for(i = 0;i < iCount;i++) {
+		Serial1.read((Uint08*)(&sTriangle), sizeof(TriInfo));
+
+		Canvas.fillTriangle(	sTriangle.aiPos[0][X], sTriangle.aiPos[0][Y],
+								sTriangle.aiPos[1][X], sTriangle.aiPos[1][Y],
+								sTriangle.aiPos[2][X], sTriangle.aiPos[2][Y], sTriangle.iColor	);
+	}
+}
+//------------------------------------------------------------------------------//
 static void MultiPioOutput(void) {
 	iPioPortBus = MultiRecep();
 	iPioDataBus = MultiRecep();
@@ -182,6 +206,7 @@ static void (* apMultiTel[CodeTelMax])(void) = {
 	MultiSynchWait,		MultiAutoExec ,
 	MultiDmaInit  ,		MultiDmaRecord,		MultiDmaMove  ,		MultiDmaExit  ,
 	MultiSerCtrl  ,		MultiSerData  ,		MultiBleUart  ,		MultiSdcBusy  ,
+	MultiZ3dFlush ,		MultiZ3dPoly  ,
 	MultiPioOutput,		MultiBnkPage  ,		MultiPioHist  ,		MultiLcdUpdt  ,
 };
 //------------------------------------------------------------------------------//

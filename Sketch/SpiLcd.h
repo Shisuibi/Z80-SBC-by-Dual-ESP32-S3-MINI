@@ -42,9 +42,6 @@
 
 
 //==============================================================================//
-static LGFX SpiLCD;										//	LGFX識別子（SPI2）
-static LGFX_Sprite Canvas(&SpiLCD);						//	LGFX識別子（スプライト）
-
 static Sint08 iCurrLcdMode;								//	現行液晶表示モード
 static Uint08 iLcdBrightness;							//	液晶表示LED輝度
 //------------------------------------------------------------------------------//

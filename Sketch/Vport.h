@@ -516,114 +516,82 @@ static void VportLcdRadY3H(void) {
 //==============================================================================//
 static void VportZ3dInit(void) {
 	if(PioInput) {	iPioDataBus = 0x00;		MultiCpuOutput();	}
-	MatrixInit(True);
+	if(Esp32Master) iCurrZ3dMode = Z3dModeInit;
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dFlushScrn(void) {
 	if(PioInput) {	iPioDataBus = 0x00;		MultiCpuOutput();	}
-	if((Esp32Master)||(LcdModeSegment)) return;
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	MatrixFlushScreen();
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	if(Esp32Master) iCurrZ3dMode = Z3dModeFlushScrn;
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dAmbiLight(void) {
 	if(PioInput) iPioDataBus = (Uint08)(255.0 * fAmbiLight);
-	else {
-		fAmbiLight = (Sflt32)iPioDataBus / 255.0;
-		MatrixAmbiLight();
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeAmbiLight;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dDiffLight(void) {
 	if(PioInput) iPioDataBus = (Uint08)(255.0 * fDiffLight);
-	else {
-		fDiffLight = (Sflt32)iPioDataBus / 255.0;
-		MatrixDiffLight();
-		if(Esp32Slave) MatrixParaLight(afCoordinate);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeDiffLight;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatPush(void) {
 	if(PioInput)	iPioDataBus = iCurrMatrix;
-	else			MatrixPush();
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatPush;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatPop(void) {
 	if(PioInput)	iPioDataBus = iCurrMatrix;
-	else			MatrixPop();
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatPop;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatUnit(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {
-		if(Esp32Slave) MatrixUnit();
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatUnit;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatCopy(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {
-		if(Esp32Slave) MatrixCopy();
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatCopy;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatRotX(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {												//	y’ˆÓz}‹«ŠEðŒ
-		if(Esp32Slave) MatrixRotateX(PI * (Sflt32)(Sint08)iPioDataBus / 128.0);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatRotX;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatRotY(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {												//	y’ˆÓz}‹«ŠEðŒ
-		if(Esp32Slave) MatrixRotateY(PI * (Sflt32)(Sint08)iPioDataBus / 128.0);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatRotY;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatRotZ(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {												//	y’ˆÓz}‹«ŠEðŒ
-		if(Esp32Slave) MatrixRotateZ(PI * (Sflt32)(Sint08)iPioDataBus / 128.0);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatRotZ;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatMulti(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {
-		if(Esp32Slave) MatrixMultiply((Sint08)iPioDataBus);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatMulti;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatTrans(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {
-		if(Esp32Slave) MatrixTrans(afCoordinate);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatTrans;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatScale(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {
-		if(Esp32Slave) MatrixScale(afCoordinate);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatScale;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatDevice(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {
-		if(Esp32Slave) MatrixDevice();
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatDevice;	}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dMatPers(void) {
 	if(PioInput) iPioDataBus = iCurrMatrix;
-	else {												//	y’ˆÓzŠp“x‚ÌkŽÚ‚ðRotateXYZ‚É‡‚í‚¹‚é
-		if(Esp32Slave) MatrixPers(PI * (Sflt32)iPioDataBus / 256.0, afCoordinate[X], afCoordinate[Y]);
-	}
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeMatPers;	}
 }
 //==============================================================================//
 
@@ -633,7 +601,7 @@ static void VportZ3dMdlClear(void) {
 	if(PioInput) {	iPioDataBus = 0x00;		MultiCpuOutput();	}
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-if(Esp32Slave) MatrixDraw();
+if(Esp32Master) MatrixDraw();
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 }
@@ -656,7 +624,7 @@ static void VportZ3dMdlPoly(void) {
 static void VportZ3dMdlEntry(void) {
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-if(Esp32Slave) MatrixEntry();
+if(Esp32Master) MatrixEntry();
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 }
@@ -664,65 +632,49 @@ if(Esp32Slave) MatrixEntry();
 static void VportZ3dMdlShade(void) {
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-if(Esp32Slave) MatrixShade();
+if(Esp32Master) MatrixShade();
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorXL(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[X] & 0x00FF);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[X] = FixToFlt(aiCoordinate[X] = (aiCoordinate[X] & 0xFF00) | ((Sfix88)iPioDataBus));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorXL;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorXH(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[X] >> 8);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[X] = FixToFlt(aiCoordinate[X] = (aiCoordinate[X] & 0x00FF) | (((Sfix88)iPioDataBus) << 8));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorXH;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorYL(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[Y] & 0x00FF);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[Y] = FixToFlt(aiCoordinate[Y] = (aiCoordinate[Y] & 0xFF00) | ((Sfix88)iPioDataBus));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorYL;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorYH(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[Y] >> 8);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[Y] = FixToFlt(aiCoordinate[Y] = (aiCoordinate[Y] & 0x00FF) | (((Sfix88)iPioDataBus) << 8));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorYH;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorZL(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[Z] & 0x00FF);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[Z] = FixToFlt(aiCoordinate[Z] = (aiCoordinate[Z] & 0xFF00) | ((Sfix88)iPioDataBus));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorZL;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorZH(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[Z] >> 8);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[Z] = FixToFlt(aiCoordinate[Z] = (aiCoordinate[Z] & 0x00FF) | (((Sfix88)iPioDataBus) << 8));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorZH;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorWL(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[W] & 0x00FF);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[W] = FixToFlt(aiCoordinate[W] = (aiCoordinate[W] & 0xFF00) | ((Sfix88)iPioDataBus));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorWL;		}
 }
 //------------------------------------------------------------------------------//
 static void VportZ3dVectorWH(void) {
 	if(PioInput)	iPioDataBus = (Uint08)(aiCoordinate[W] >> 8);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
-	else			afCoordinate[W] = FixToFlt(aiCoordinate[W] = (aiCoordinate[W] & 0x00FF) | (((Sfix88)iPioDataBus) << 8));
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
+	else {	if(Esp32Master) iCurrZ3dMode = Z3dModeVectorWH;		}
 }
 //==============================================================================//
 

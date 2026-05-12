@@ -69,8 +69,8 @@ inline void LGFX::LgfxUserSpiBs(void) {
 	auto cfg				=	_spibs_instance.config();
 
 	cfg.spi_host			=	SPI2_HOST;
-	cfg.freq_write			=	40000000;
-	cfg.freq_read			=	20000000;
+	cfg.freq_write			=	80000000;
+	cfg.freq_read			=	80000000;
 
 	cfg.pin_mosi			=	GpioLcdSdi;
 	cfg.pin_sclk			=	GpioLcdSck;

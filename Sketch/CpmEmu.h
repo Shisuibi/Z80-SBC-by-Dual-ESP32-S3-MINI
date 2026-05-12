@@ -122,7 +122,9 @@ static Cint08 aiSdcDispString[0x0C] = {					//	進捗状況表示文字列
 };
 //------------------------------------------------------------------------------//
 static SdFat SD;										//	SdFat識別子
+
 static Sint08 iCurrCpmMode;								//	現行CP/Mモード
+static Uint08 aiStringBuf[StringSizeL];					//	文字列緩衝
 
 static SdcDirEntry DirEntryRecord;						//	管理情報登録レコード
 static SdcDirEntry DirExtentRecord;						//	管理情報範囲レコード
