@@ -107,7 +107,8 @@
 　　　｜―　LgfxUser.hpp　　　　　　　　…　LovyanGFXライブラリの設定ファイル
 　　　｜―　Matrix.h　　　　　　　　　　…　定義ファイル（幾何学演算）
 　　　｜―　Multi.h 　　　　　　　　　　…　定義ファイル（M/S相互通信）
-　　　｜―　PC-84C0SD.c 　　　　　　　　…　ESP32スケッチ（拡張子を.inoに変更して下さい）
+　　　｜―　PC-84C0SD_Master.c　　　　　…　ESP32スケッチ（拡張子を.inoに変更して下さい）
+　　　｜―　PC-84C0SD_Slave.c 　　　　　…　ESP32スケッチ（拡張子を.inoに変更して下さい）
 　　　｜―　Reset.h 　　　　　　　　　　…　定義ファイル（リセット）
 　　　｜―　RomImage.h　　　　　　　　　…　ROMのバイナリデータ
 　　　｜―　SpiLcd.h　　　　　　　　　　…　定義ファイル（液晶表示）
@@ -200,7 +201,8 @@
 
 ★Arduino IDE開発環境
 
-　SketchフォルダのPC-84C0SD.cの拡張子を.inoに変更して下さい
+　SketchフォルダのPC-84C0SD_Master.cの拡張子を.inoに変更して下さい
+　SketchフォルダのPC-84C0SD_Slave.cの拡張子を.inoに変更して下さい
 
 　コメント行の文字化けが気になる人は、原本ファイルの内容を
 　メモ帳などで全て選択して、Arduino IDEのエディタ画面で
