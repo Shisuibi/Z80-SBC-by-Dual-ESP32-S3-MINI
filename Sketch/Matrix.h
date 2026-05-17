@@ -396,7 +396,7 @@ static void MatrixClear(void) {
 	iCurrZ3dModel = 0;
 	iCurrZ3dStorage = 0;
 
-	iModelEntry = iModelShade = 0x0100;
+	iModelEntry = iModelShade = 0xFFFF;
 #ifdef		BuildMaster
 	for(i = 0;i < 0x0100;i++)	asModelInfo[i].ModelHead.iExternal = 0;
 #endif
@@ -695,13 +695,13 @@ static void Z3dApiMdlPoly(void) {
 //------------------------------------------------------------------------------//
 static void Z3dApiMdlEntry(void) {
 	iModelEntry = (Uint16)iPioDataBus;	MatrixEntry(iPioDataBus);
-	if(iModelEntry == iModelShade) {	iModelEntry = iModelShade = 0x0100;		MatrixDraw();	}
+	if(iModelEntry == iModelShade) {	iModelEntry = iModelShade = 0xFFFF;		MatrixDraw();	}
 	iCurrZ3dProc = Z3dProcStandBy;
 }
 //------------------------------------------------------------------------------//
 static void Z3dApiMdlShade(void) {
 	iModelShade = (Uint16)iPioDataBus;	MatrixShade(iPioDataBus);
-	if(iModelEntry == iModelShade) {	iModelEntry = iModelShade = 0x0100;		MatrixDraw();	}
+	if(iModelEntry == iModelShade) {	iModelEntry = iModelShade = 0xFFFF;		MatrixDraw();	}
 	iCurrZ3dProc = Z3dProcStandBy;
 }
 //------------------------------------------------------------------------------//
